@@ -48,8 +48,7 @@ systemctl start zabbix-server.service
 
 **0.9.5 (2021-07-20)**
 - ENH: Support for Zabbix 5.2 and 5.4
-- FIX: Be more specific on detecting mysql socket
-- 
+
 **0.9.4 (2021-01-21)**
 - ENH: Support for Zabbix 5.0
 - FIX: Be more specific on detecting mysql socket
