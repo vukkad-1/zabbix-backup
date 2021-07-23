@@ -32,6 +32,8 @@ VERSION=0.9.5
 #      - Tiago Cruz (tiago-cruz-movile)
 #      - Mario Trangoni (mjtrangoni)
 #      - ironbishop
+#      - Stephan (stephankn)
+#      - Andrew P. (diffway)
 #
 # AUTHOR
 #     Jens Berthold (maxhq), 2020
@@ -320,6 +322,7 @@ case $DBTYPE in
         DB_OPTS=("${DB_OPTS[@]}" -P"$DBPORT")
         DB_OPTS_BATCH=("${DB_OPTS[@]}" --batch --silent)
         [ -n "$DBNAME" ] && DB_OPTS_BATCH=("${DB_OPTS_BATCH[@]}" -D $DBNAME)
+        [ "${COLUMN_NAMES}" == "yes" ] && DB_OPTS=("${DB_OPTS[@]}" --complete-insert --quote-names)
         ;;
     psql)
         [ -n "$DBSOCKET" ] && DB_OPTS=("${DB_OPTS[@]}" -h $DBSOCKET)
@@ -333,6 +336,7 @@ case $DBTYPE in
         fi
         DB_OPTS_BATCH=("${DB_OPTS[@]}" -Atw)
         [ -n "$DBNAME" ] && DB_OPTS_BATCH=("${DB_OPTS_BATCH[@]}" -d $DBNAME)
+        [ "${COLUMN_NAMES}" == "yes" ] && DB_OPTS=("${DB_OPTS[@]}" --format=plain --inserts --column-inserts --quote-all-identifiers)
         ;;
 esac
 
@@ -526,10 +530,6 @@ case $DBTYPE in
         # dump data
         DUMP_OPTS=(--opt --single-transaction --skip-lock-tables --no-create-info --skip-extended-insert)
 
-        if [ "${COLUMN_NAMES}" == "yes" ]; then
-            DUMP_OPTS+=( --complete-insert --quote-names )
-        fi
-
         while read -r table; do
             if elementIn "$table" "${SCHEMAONLY_TABLES[@]}"; then
                 DUMP_OPTS+=(--ignore-table=$DBNAME.$table)
@@ -547,11 +547,7 @@ case $DBTYPE in
         if [ $? -ne 0 ]; then echo $'\nERROR: Could not backup table data.\n' >&2; cat $ERRORLOG >&2; exit 1; fi
     ;;
     psql)
-        DUMP_OPTS=( --format=plain )
-
-        if [ "${COLUMN_NAMES}" == "yes" ]; then
-            DUMP_OPTS+=( --inserts --column-inserts --quote-all-identifiers )
-        fi
+        DUMP_OPTS=()
 
         while read -r table; do
             if [ $HANDLE_UNKNOWN == "ignore" ]; then
