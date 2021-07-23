@@ -46,8 +46,9 @@ systemctl start zabbix-server.service
 
 ## Version history
 
-**0.9.5 (2021-07-20)**
+**0.9.5 (2021-07-23)**
 - ENH: Support for Zabbix 5.2 and 5.4
+- ENH: Add column names to INSERT INTO .. VALUES and quote names as needed (@diffway)
 
 **0.9.4 (2021-01-21)**
 - ENH: Support for Zabbix 5.0

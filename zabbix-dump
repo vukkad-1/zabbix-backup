@@ -32,6 +32,8 @@ VERSION=0.9.5
 #      - Tiago Cruz (tiago-cruz-movile)
 #      - Mario Trangoni (mjtrangoni)
 #      - ironbishop
+#      - Stephan (stephankn)
+#      - Andrew P. (diffway)
 #
 # AUTHOR
 #     Jens Berthold (maxhq), 2020
@@ -56,6 +58,7 @@ DEFAULT_DBPASS=""
 COMPRESSION="gz"
 QUIET="no"
 REVERSELOOKUP="yes"
+COLUMN_NAMES="no"
 GENERATIONSTOKEEP=0
 ZBX_CONFIG="/etc/zabbix/zabbix_server.conf"
 READ_ZBX_CONFIG="yes"
@@ -149,6 +152,9 @@ OPTIONS
     -n
         Skip reverse lookup of IP address for host.
 
+    -N
+        Add column names in INSERT INTO .. VALUES .. and quote them as needed
+
     -f
         Force backup for unknown tables / forward compatibility:
         Don't complain about unknown tables and make a full backup of them
@@ -194,7 +200,7 @@ fi
 # PARSE COMMAND LINE ARGUMENTS
 #
 DB_GIVEN=0
-while getopts ":c:S:d:H:o:p:P:r:s:t:u:z:0nqxZfiv" opt; do
+while getopts ":c:S:d:H:o:p:P:r:s:t:u:z:0nNqxZfiv" opt; do
     case $opt in
         t)  DBTYPE="$OPTARG" ;;
         H)  ODBHOST="$OPTARG" ;;
@@ -212,6 +218,7 @@ while getopts ":c:S:d:H:o:p:P:r:s:t:u:z:0nqxZfiv" opt; do
         x)  COMPRESSION="xz" ;;
         0)  COMPRESSION="" ;;
         n)  REVERSELOOKUP="no" ;;
+        N)  COLUMN_NAMES="yes" ;;
         f)  HANDLE_UNKNOWN="backup" ;;
         i)  HANDLE_UNKNOWN="ignore" ;;
         q)  QUIET="yes" ;;
@@ -315,6 +322,7 @@ case $DBTYPE in
         DB_OPTS=("${DB_OPTS[@]}" -P"$DBPORT")
         DB_OPTS_BATCH=("${DB_OPTS[@]}" --batch --silent)
         [ -n "$DBNAME" ] && DB_OPTS_BATCH=("${DB_OPTS_BATCH[@]}" -D $DBNAME)
+        [ "${COLUMN_NAMES}" == "yes" ] && DB_OPTS=("${DB_OPTS[@]}" --complete-insert --quote-names)
         ;;
     psql)
         [ -n "$DBSOCKET" ] && DB_OPTS=("${DB_OPTS[@]}" -h $DBSOCKET)
@@ -328,6 +336,7 @@ case $DBTYPE in
         fi
         DB_OPTS_BATCH=("${DB_OPTS[@]}" -Atw)
         [ -n "$DBNAME" ] && DB_OPTS_BATCH=("${DB_OPTS_BATCH[@]}" -d $DBNAME)
+        [ "${COLUMN_NAMES}" == "yes" ] && DB_OPTS=("${DB_OPTS[@]}" --format=plain --inserts --column-inserts --quote-all-identifiers)
         ;;
 esac
 
