@@ -46,6 +46,12 @@ systemctl start zabbix-server.service
 
 ## Version history
 
+**0.9.9 (2022-08-31)**
+- ENH: zabbix dump add custom format (pg), stdout dump (@gullevek)
+- ENH: minimal automated syntax check through Github Actions
+- FIX: table schema for PostgreSQL (@jokay)
+- FIX: retrieving DBPassword when it contains a "=" (@mathieumd)
+
 **0.9.8 (2022-07-27)**
 - ENH: Support for Zabbix 6.2
 
